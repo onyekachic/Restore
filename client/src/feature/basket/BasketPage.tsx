@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Grid,
-  IconButton,
   Paper,
   Table,
   TableBody,
@@ -14,37 +13,17 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import agent from '../../app/api/agent';
-import { useStoreContext } from '../../app/context/StoreContext';
-import LoadingComponent from '../../app/layout/LoadingComponent';
-import { Basket } from '../../app/models/basket';
+import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
 import BasketSummary from './BasketSummary';
+import {
+  addBasketItemAsync,
+  removeBasketItemAsync,
+} from '../../feature/basket/basketSlice';
 
 export default function BasketPage() {
-  const { basket, setBasket, removeItem } = useStoreContext();
-
-  const [status, setStatus] = useState({
-    loading: false,
-    name: '',
-  });
-
-  function handleAddItem(productId: number, name: string) {
-    setStatus({ loading: true, name });
-    agent.Basket.addItem(productId)
-      .then((basket) => setBasket(basket))
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: true, name: '' }));
-  }
-
-  function handleRemoveItem(productId: number, quantity = 1, name: string) {
-    setStatus({ loading: true, name });
-    agent.Basket.removeItem(productId, quantity)
-      .then(() => removeItem(productId, quantity))
-      .catch((error) => console.log(error))
-      .finally(() => setStatus({ loading: true, name: '' }));
-  }
+  const { basket, status } = useAppSelector((state) => state.basket);
+  const dispatch = useAppDispatch();
 
   if (!basket)
     return <Typography variant="h3">Your basket is empty</Typography>;
@@ -84,13 +63,15 @@ export default function BasketPage() {
                 <TableCell align="center">
                   <LoadingButton
                     loading={
-                      status.loading && status.name === 'rem' + item.productId
+                      status === 'pendingRemoveItem' + item.productId + 'rem'
                     }
                     onClick={() =>
-                      handleRemoveItem(
-                        item.productId,
-                        1,
-                        'rem' + item.productId
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: 1,
+                          name: 'rem',
+                        })
                       )
                     }
                     color="error"
@@ -100,11 +81,13 @@ export default function BasketPage() {
                   {item.quantity}
 
                   <LoadingButton
-                    loading={
-                      status.loading && status.name === 'add' + item.productId
-                    }
+                    loading={status === 'pendingAddItem' + item.productId}
                     onClick={() =>
-                      handleAddItem(item.productId, 'add' + item.productId)
+                      dispatch(
+                        addBasketItemAsync({
+                          productId: item.productId,
+                        })
+                      )
                     }
                     color="secondary"
                   >
@@ -117,13 +100,15 @@ export default function BasketPage() {
                 <TableCell align="right">
                   <LoadingButton
                     loading={
-                      status.loading && status.name === 'del' + item.productId
+                      status === 'pendingRemoveItem' + item.productId + 'del'
                     }
                     onClick={() =>
-                      handleRemoveItem(
-                        item.productId,
-                        item.quantity,
-                        'del' + item.productId
+                      dispatch(
+                        removeBasketItemAsync({
+                          productId: item.productId,
+                          quantity: item.quantity,
+                          name: 'del',
+                        })
                       )
                     }
                     color="error"
