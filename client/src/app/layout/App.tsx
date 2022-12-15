@@ -21,6 +21,8 @@ import LoadingComponent from './LoadingComponent';
 import CheckoutPage from '../../feature/checkout/CheckoutPage';
 import { useAppDispatch } from '../store/configureStore';
 import { setBasket } from '../../feature/basket/basketSlice';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const dispatch = useAppDispatch();
@@ -56,6 +58,8 @@ function App() {
   if (loading) return <LoadingComponent message="Initializing app..." />;
   return (
     <ThemeProvider theme={theme}>
+      <ToastContainer position="bottom-right" hideProgressBar theme="colored" />
+
       <CssBaseline />
       <Header darkMode={darkMode} handleThemeChange={handleThemeChange} />
       <Container>

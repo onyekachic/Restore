@@ -12,6 +12,8 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import NotFound from '../../app/errors/NotFound';
+import LoadingComponent from '../../app/layout/LoadingComponent';
 import { useAppDispatch, useAppSelector } from '../../app/store/configureStore';
 import {
   addBasketItemAsync,
@@ -63,9 +65,10 @@ export default function ProductDetails() {
     }
   }
 
-  if (productStatus.includes('pending')) return <h3>loading .....</h3>;
+  if (productStatus.includes('pending'))
+    return <LoadingComponent message="Loading Product...." />;
 
-  if (!product) return <h3>product not found</h3>;
+  if (!product) return <NotFound />;
 
   return (
     <Grid container spacing={6}>

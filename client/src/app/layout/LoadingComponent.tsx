@@ -10,7 +10,7 @@ export default function LoadingComponent({ message = 'Loading...' }: Props) {
     <Backdrop open={true} invisible={true}>
       <Box
         display="flex"
-        justifyContent="center"
+        justifyContent="center" 
         alignItems="center"
         height="100vh"
       >
